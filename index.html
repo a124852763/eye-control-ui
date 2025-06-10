@@ -1,0 +1,198 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>眼控UI-退格键修复</title>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: #0b1120;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .screen {
+      width: 1024px;
+      height: 768px;
+      background: #131a2b;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .input-box {
+      height: 60px;
+      background: #000;
+      color: #fff;
+      font-size: 28px;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 10px;
+    }
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .tabs button {
+      flex: 1;
+      padding: 14px 0;
+      font-size: 18px;
+      font-weight: bold;
+      background-color: #3a3f4b;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .tabs button.active {
+      background-color: #2563eb;
+    }
+    .keyboard, .numpad, .direction-pad {
+      display: none;
+      gap: 16px;
+    }
+    .keyboard {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      row-gap: 16px;
+    }
+    .numpad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      row-gap: 16px;
+    }
+    .direction-pad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      row-gap: 16px;
+    }
+    .keyboard button, .numpad button, .direction-pad button {
+      height: 80px;
+      font-size: 24px;
+      font-weight: bold;
+      background-color: #505358;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+    }
+    .direction-pad button {
+      font-size: 36px;
+    }
+    .direction-pad button.center {
+      font-size: 24px;
+    }
+    .special {
+      grid-column: span 5;
+    }
+    .clear-btn {
+      position: absolute;
+      right: 40px;
+      top: 30px;
+      background: #505358;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+
+  <style>
+    .direction-pad button {
+      font-size: 36px;
+    }
+    .direction-pad button.center {
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="screen">
+    <div style="position: relative;">
+      <div class="input-box" id="display"></div>
+      <button class="clear-btn" onclick="clearDisplay()">清空</button>
+    </div>
+    <div class="tabs">
+      <button class="active" onclick="showTab('keyboard')">英文键盘</button>
+      <button onclick="showTab('numpad')">数字键盘</button>
+      <button onclick="showTab('direction')">方向控制</button>
+    </div>
+
+    <div class="keyboard" id="keyboard">
+      
+<!-- 英文字符 -->
+<button>Q</button><button>W</button><button>E</button><button>R</button><button>T</button>
+<button>Y</button><button>U</button><button>I</button><button>O</button><button>P</button>
+<button>A</button><button>S</button><button>D</button><button>F</button><button>G</button>
+<button>H</button><button>J</button><button>K</button><button>L</button>
+<button>Z</button><button>X</button><button>C</button><button>V</button><button>B</button>
+<button>N</button><button>M</button>
+<!-- 符号行 -->
+<button>.</button><button>,</button><button>!</button><button>?</button><button>@</button>
+<button>#</button><button>$</button><button>%</button><button>&</button><button>*</button>
+<button>(</button><button>)</button><button>-</button><button>_</button><button>=</button>
+<button>+</button><button>:</button><button>;</button><button>"</button><button>'</button>
+<button><</button><button>></button><button>/</button><button>\</button><button>~</button>
+<button>`</button>
+<!-- 控制键 -->
+<button class="special">空格</button><button class="special">退格</button>
+
+    </div>
+
+    <div class="numpad" id="numpad" style="display:none">
+      <button>1</button><button>2</button><button>3</button>
+      <button>4</button><button>5</button><button>6</button>
+      <button>7</button><button>8</button><button>9</button>
+      <button>.</button><button>0</button><button>退格</button>
+    </div>
+
+    <div class="direction-pad" id="direction" style="display:none">
+      <button></button><button>⬆</button><button></button>
+      <button>⬅</button><button class="center">选择</button><button>➡</button>
+      <button></button><button>⬇</button><button></button>
+    </div>
+  </div>
+
+  <script>
+    function showTab(tab) {
+      document.getElementById('keyboard').style.display = 'none';
+      document.getElementById('numpad').style.display = 'none';
+      document.getElementById('direction').style.display = 'none';
+      document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(tab).style.display = 'grid';
+      event.target.classList.add('active');
+    }
+
+    function clearDisplay() {
+      document.getElementById('display').textContent = '';
+    }
+
+    document.querySelectorAll('button').forEach(btn => {
+      if (!['英文键盘', '数字键盘', '方向控制', '清空'].includes(btn.textContent)) {
+        btn.addEventListener('click', () => {
+          const display = document.getElementById('display');
+          if (btn.textContent === '退格') {
+            display.textContent = display.textContent.slice(0, -1);
+          } else if (btn.textContent === '空格') {
+            display.textContent += ' ';
+          } else {
+            display.textContent += btn.textContent;
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
